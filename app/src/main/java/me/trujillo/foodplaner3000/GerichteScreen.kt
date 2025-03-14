@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-
 
 @Composable
 fun GerichteScreen(navController: NavHostController){
@@ -69,7 +69,7 @@ fun GerichteScreen(navController: NavHostController){
                     .padding(10.dp)
             ) {
                 Text(
-                    text = "Plates...               ",
+                    text = "Gerichte...               ",
 
                     color = Color.White
                 )

@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.magnifier
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -28,65 +29,47 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DismissDirection
+import androidx.compose.material3.DismissValue
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
-@Composable
-fun BottomIconButtons(navController: NavHostController) {
-    // Row für die Icons am unteren Rand der App
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()  // Füllt die gesamte Breite aus
-            .padding(16.dp), // Optionales Padding
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-
-    ) {
-        // Erster Button
-        IconButton(onClick = { navController.navigate("screen1") }) {
-            Icon(Icons.Filled.Home, contentDescription = "Home", tint = Color.White)
-        }
-        // Zweiter Button
-        IconButton(onClick = { navController.navigate("screen2") }) {
-            Icon(Icons.Filled.Favorite, contentDescription = "Favorite", tint = Color.White)
-        }
-        // Dritter Button
-        IconButton(onClick = { /* Aktion für den dritten Button */ }) {
-            Icon(Icons.Filled.Search, contentDescription = "Search", tint = Color.White)
-        }
-        // Vierter Button
-        IconButton(onClick = { /* Aktion für den vierten Button */ }) {
-            Icon(Icons.Filled.Settings, contentDescription = "Settings", tint = Color.White)
-        }
-    }
-}
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -96,6 +79,11 @@ fun ListScreen(navController: NavHostController,
 
     val items = viewModel.items
     val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+    var deletedItem by remember { mutableStateOf<Item?>(null) }
+    var deletedItemIndex by remember { mutableStateOf<Int?>(null) }
+
+
 
 
     Column(modifier = Modifier
@@ -128,25 +116,23 @@ fun ListScreen(navController: NavHostController,
                     .padding(10.dp)
             ) {
                 Text(
-                    text = "Shoppinglist...               ",
+                    text = "Einkaufsliste...               ",
 
                     color = Color.White
                 )
 
-              /*  Box(
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .background(Color.White, shape = RoundedCornerShape(50))
-                        .size(15.dp))
-                {
-                    Icon(
-                        imageVector = Icons.Filled.Close, // Das "X"-Icon
-                        contentDescription = "Delete",
-                        tint = Color.Black,
-                        modifier = Modifier.size(15.dp) // Größe des Icons anpassen
-                    )
-              //  }*/
+
             }
+
+                SnackbarHost(
+                    hostState = snackbarHostState,
+                    modifier = Modifier
+                        .size(180.dp,80.dp)
+                        .align(Alignment.BottomEnd)
+                        .padding(top = 6.dp)
+
+                )
+
         }
 
         Divider(
@@ -173,17 +159,52 @@ fun ListScreen(navController: NavHostController,
                     var itemToEdit by remember { mutableStateOf<Item?>(null) }
                     var showDeleteDialog by remember { mutableStateOf(false) }
                     var itemToDelete by remember { mutableStateOf<Item?>(null) }
+                    var isHandled by remember { mutableStateOf(false) }
+                    val removedItemName = item.name
+                    val removedQuantity = item.quantity
+                    val removedItemUnit = item.unit
 
 
-                    if (dismissState.isDismissed(DismissDirection.EndToStart)) {
-                        viewModel.removeItem(index) // Lösche das Element über das ViewModel
+
+                    if (dismissState.isDismissed(DismissDirection.EndToStart)&& !isHandled) {
+                        isHandled = true
+                        val removedItem = item
+                        // Entferne das Item direkt aus der Liste
+                        viewModel.removeItem(index)
+
+                        println("schrit 1")
+
+                        scope.launch {
+                            val result = snackbarHostState.showSnackbar(
+                                message = "deleted ${removedItem.name}",
+                                actionLabel = "Undo",
+                                duration = SnackbarDuration.Short
+
+                            )
+                            println("schritt0")
+                            if (result == SnackbarResult.ActionPerformed) {
+                                println("schritt1.5")
+                                // Stelle das gelöschte Item wieder her
+                                viewModel.addItem(removedItemName,removedQuantity, removedItemUnit)
+                                println("additem")
+                                isHandled = false
+                                dismissState.reset()
+                            }
+                            dismissState.reset()
+                        }
+
+
+                        // Setze den Zustand des Swipe zurück
+
+
+
                     }
                     if (showEditDialog == true) {
                         EditItemDialog(
                             item = itemToEdit!!,
                             onDismiss = { showEditDialog = false },
-                            onConfirm = { newName, newQuantity ->
-                                viewModel.onEditItem(itemToEdit!!, newName, newQuantity)
+                            onConfirm = { newName, newQuantity, newUnit ->
+                                viewModel.onEditItem(itemToEdit!!, newName, newQuantity, newUnit )
                                 showEditDialog = false
                             }
                         )
@@ -197,6 +218,7 @@ fun ListScreen(navController: NavHostController,
                                 TextButton(onClick = {
                                     viewModel.removeItem(items.indexOf(itemToDelete!!)) // Lösche das Item
                                     showDeleteDialog = false // Schließe den Dialog
+
                                 }) {
                                     Text("Delete")
                                 }
@@ -209,33 +231,39 @@ fun ListScreen(navController: NavHostController,
                         )
                     }
 
-                        SwipeToDismiss(
-                            state = dismissState,
-                            directions = setOf(
-                                DismissDirection.EndToStart,
-                                DismissDirection.StartToEnd
-                            ),
-                            background = {
-                                val direction = dismissState.dismissDirection
-                                val text = when (direction) {
-                                    DismissDirection.StartToEnd -> "Edit"
-                                    DismissDirection.EndToStart -> "Delete"
-                                    else -> ""
-                                }
-
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(Color(0xFF212121))
-                                        .padding(16.dp)
-                                ) {
-                                    Text(
-                                        text = "Delete",
-                                        color = Color(0xFF8B0000),
-                                        modifier = Modifier.align(Alignment.CenterEnd)
-                                    )
-                                }
+                    SwipeToDismiss(
+                        state = dismissState,
+                        directions = setOf(
+                            DismissDirection.EndToStart, // Nach links ziehen für "Delete"
+                            DismissDirection.StartToEnd  // Nach rechts ziehen für "Edit"
+                        ),
+                        background = {
+                            val direction = dismissState.dismissDirection
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(Color(0xFF212121)) // Einheitlicher Hintergrund
+                                    .padding(16.dp)
+                            ) {
+                                when (direction) {
+                                    DismissDirection.StartToEnd -> { // Nach-Rechts-Swipen (Edit)
+                                        Text(
+                                            text = "Edit",
+                                            color = Color(0xFF4CAF50), // Grün
+                                            modifier = Modifier.align(Alignment.CenterStart) // Links platzieren
+                                        )
+                                    }
+                                    DismissDirection.EndToStart -> { // Nach-Links-Swipen (Delete)
+                                        Text(
+                                            text = "Delete",
+                                            color = Color(0xFFFF0000), // Rot
+                                            modifier = Modifier.align(Alignment.CenterEnd) // Rechts platzieren
+                                        )
+                                    }
+                                    else -> Unit // Kein Text
+                                }}
                             },
+
                             dismissContent = {
                                 Box(
                                     modifier = Modifier
@@ -252,7 +280,7 @@ fun ListScreen(navController: NavHostController,
                                         horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
                                         Text(
-                                            text = "${item.name}: ${item.quantity}",
+                                            text = " ${item.quantity}${item.unit} ${item.name}",
                                             fontSize = 18.sp
                                         )
                                         Row(
@@ -273,19 +301,27 @@ fun ListScreen(navController: NavHostController,
                                                showDeleteDialog = true},
                                                 modifier = Modifier.size(24.dp)) {
                                                 Icon(Icons.Filled.Delete, contentDescription = "Delete")
-
                                             }
                                         }
                                     }
                                 }
                             }
-                        )
+                    )
+
+
+                    if (dismissState.progress > 0.5f && dismissState.targetValue == DismissValue.DismissedToEnd) {
+                        itemToEdit = item
+                        showEditDialog = true
+                        scope.launch {
+                            dismissState.snapTo(DismissValue.Default) // Edited line: Reset swipe state
+                        }
+                    }
+
+
 
 
                 }
-
             }
-
 
             var showAddDialog by remember { mutableStateOf(false) }
 
@@ -308,10 +344,13 @@ fun ListScreen(navController: NavHostController,
             }
             if (showAddDialog) {
                 AddItemDialog(
-                    onDismiss = { showAddDialog = false },
-                    onAddItem = { name, quantity ->
-                        viewModel.addItem(name, quantity)
-                        showAddDialog = false
+
+                    onAddItem = { name, quantity, unit ->
+                        viewModel.addItem(name, quantity, unit) // Item hinzufügen
+                        showAddDialog = false // Dialog schließen
+                    },
+                    onDismiss = {
+                        showAddDialog = false // Dialog schließen
                     }
                 )
             }
@@ -331,13 +370,20 @@ fun ListScreen(navController: NavHostController,
 
 }
 
+//################################### AddItem #########################################
+
 @Composable
 fun AddItemDialog(
+
     onDismiss: () -> Unit,
-    onAddItem: (String, String) -> Unit
+    onAddItem: (String, Int, Unit1) -> Unit
 ) {
     var name by remember { mutableStateOf("") }
-    var quantity by remember { mutableStateOf("") }
+    var quantity by remember { mutableStateOf(0) }
+    var expanded by remember { mutableStateOf(false) } // Steuert die Sichtbarkeit des Menüs
+    var selectedUnit by remember { mutableStateOf(Unit1.x) } // Aktuell ausgewählte Einheit
+
+
 
     AlertDialog(
         onDismissRequest = { onDismiss() },
@@ -348,6 +394,7 @@ fun AddItemDialog(
             ) },
         text = {
             Column {
+
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
@@ -356,17 +403,30 @@ fun AddItemDialog(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
-                    value = quantity,
-                    onValueChange = { quantity = it },
+                    value = if (quantity == 0) "" else quantity.toString(), // Zeige leeres Feld, wenn 0
+                    onValueChange = {
+
+                            quantity = it.toIntOrNull() ?: 1
+
+                    },
                     label = { Text("quantity") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
                 )
+                Spacer(modifier = Modifier.height(8.dp))
+                UnitDropdownMenu(selectedUnit = selectedUnit,
+                    onUnitSelected = { selectedUnit = it } )
+
+
+
+
             }
         },
         confirmButton = {
             TextButton(onClick = {
-                if (name.isNotBlank() && quantity.isNotBlank()) {
-                    onAddItem(name, quantity)
+                if (name.isNotBlank()) {
+                    val finalQuantity = if (quantity > 0) quantity else 1 // Standardwert 1 setzen
+                    onAddItem(name, finalQuantity, selectedUnit)
                 }
             }) {
                 Text("Add")
@@ -379,14 +439,18 @@ fun AddItemDialog(
         }
     )
 }
+
+//################################### Edit #########################################
 @Composable
 fun EditItemDialog(
     item: Item,
     onDismiss: () -> Unit,
-    onConfirm: (String, String) -> Unit
+    onConfirm: (String, Int, Unit1) -> Unit
 ) {
     var name by remember { mutableStateOf(item.name) }
-    var quantity by remember { mutableStateOf(item.quantity) }
+    var quantity by remember { mutableStateOf(item.quantity.toString()) }
+    var selectedUnit by remember { mutableStateOf(item.unit) }
+
 
     AlertDialog(
         onDismissRequest = { onDismiss() },
@@ -406,12 +470,15 @@ fun EditItemDialog(
                     label = { Text("Quantity") },
                     modifier = Modifier.fillMaxWidth()
                 )
+                UnitDropdownMenu(selectedUnit = selectedUnit,
+                    onUnitSelected = { selectedUnit = it } )
+
             }
         },
         confirmButton = {
             TextButton(onClick = {
                 if (name.isNotBlank() && quantity.isNotBlank()) {
-                    onConfirm(name, quantity)
+                    onConfirm(name, quantity.toInt(), selectedUnit)
                 }
             }) {
                 Text("Save")
@@ -424,6 +491,74 @@ fun EditItemDialog(
         }
     )
 }
+
+//################################### Dropdown #########################################
+
+@Composable
+fun UnitDropdownMenu(
+    selectedUnit: Unit1,
+    onUnitSelected: (Unit1) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Box {
+        // Button zum Öffnen des Menüs
+        TextButton(onClick = { expanded = true }) {
+            Text("Selected Unit: ${selectedUnit.name}")
+        }
+
+        // Dropdown-Menü
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            Unit1.values().forEach { unit ->
+                DropdownMenuItem(
+                    text = { Text(unit.name) }, // Zeigt den Namen der Einheit
+                    onClick = {
+                        onUnitSelected(unit) // Rückgabe der ausgewählten Einheit
+                        expanded = false // Menü schließen
+                    }
+                )
+            }
+        }
+    }
+}
+
+//################################### BottomIconButtons #########################################
+
+
+@Composable
+fun BottomIconButtons(navController: NavHostController) {
+    // Row für die Icons am unteren Rand der App
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()  // Füllt die gesamte Breite aus
+            .padding(16.dp), // Optionales Padding
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+
+    ) {
+        // Erster Button
+        IconButton(onClick = { navController.navigate("screen1") }) {
+            Icon(Icons.Filled.Home, contentDescription = "Home", tint = Color.White)
+        }
+        // Zweiter Button
+        IconButton(onClick = { navController.navigate("screen2") }) {
+            Icon(Icons.Filled.Favorite, contentDescription = "Favorite", tint = Color.White)
+        }
+        // Dritter Button
+        IconButton(onClick = { /* Aktion für den dritten Button */ }) {
+            Icon(Icons.Filled.Search, contentDescription = "Search", tint = Color.White)
+        }
+        // Vierter Button
+        IconButton(onClick = { /* Aktion für den vierten Button */ }) {
+            Icon(Icons.Filled.Settings, contentDescription = "Settings", tint = Color.White)
+        }
+    }
+}
+
+//################################### Prewiev #########################################
 
 @Preview(showBackground = true)
 @Composable
