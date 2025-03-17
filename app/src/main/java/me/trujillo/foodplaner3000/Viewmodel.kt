@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 
 
-class ViewModel : ViewModel() {
+class ItemViewModel : ViewModel() {
 
     private var _items = mutableStateListOf(
         Item("Eier", 14, Unit1.x),
@@ -42,7 +42,16 @@ class ViewModel : ViewModel() {
         }
     }
 }
-val exampleDishes = listOf(
+
+data class DishItem(
+    val item: Item,
+    val quantity: Int,
+    val unit: Unit1
+)
+
+
+class GerichteViewModel : ViewModel(){
+val gerichte = mutableStateListOf(
     Dish(
         name = "Spaghetti Bolognese",
         items = listOf(
@@ -135,5 +144,5 @@ val exampleDishes = listOf(
         ),
         categories = listOf(Category("Französisch"), Category("Vegetarisch"))
     )
-)
+)}
 

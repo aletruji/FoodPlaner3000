@@ -75,7 +75,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListScreen(navController: NavHostController,
-               viewModel: ViewModel = viewModel()){
+               viewModel: ItemViewModel = viewModel()){
 
     val items = viewModel.items
     val scope = rememberCoroutineScope()
