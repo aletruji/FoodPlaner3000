@@ -149,5 +149,30 @@ val gerichte = mutableStateListOf(
         ),
         categories = listOf(Category("Französisch"), Category("Vegetarisch"))
     )
-)}
+)
 
+    fun addDish(dish: Dish) {
+
+            gerichte.add(dish)
+
+
+    }
+}
+
+val itemList = listOf(
+    singleItem(name="Apfel", g_per_piece = 150, unit = Unit1.g),
+    singleItem(name="Banane", g_per_piece = 120, unit = Unit1.g),
+    singleItem(name="Milch", g_per_piece = null, unit = Unit1.ml),
+    singleItem(name="Eier", g_per_piece = 50, unit = Unit1.x),
+    singleItem(name="Brot", g_per_piece = 500, unit = Unit1.g),
+    singleItem(name="Butter", g_per_piece = 250, unit = Unit1.g),
+    singleItem(name="Käse", g_per_piece = 200, unit = Unit1.g),
+    singleItem(name="Tomate", g_per_piece = 80, unit = Unit1.g),
+    singleItem(name="Kartoffel", g_per_piece = 300, unit = Unit1.g),
+    singleItem(name="Zwiebel", g_per_piece = 150, unit = Unit1.g),
+    singleItem(name="Karotte", g_per_piece = 100, unit = Unit1.g),
+    singleItem(name="Salat", g_per_piece = 400, unit = Unit1.g),
+    singleItem(name="Joghurt", g_per_piece = 500, unit = Unit1.ml),
+    singleItem(name="Schokolade", g_per_piece = 100, unit = Unit1.g),
+    singleItem(name="Nüsse", g_per_piece = 200, unit = Unit1.g)
+)

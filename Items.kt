@@ -14,6 +14,11 @@ data class Category(
     val name: String,
     val description: String? = null
 )
+data class singleItem(
+    val name: String,
+    val g_per_piece: Int? = null,
+    val unit: Unit1? = Unit1.x
+)
 
 data class Dish(
     val name: String,
