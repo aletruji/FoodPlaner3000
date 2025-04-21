@@ -501,7 +501,7 @@ fun BottomIconButtons(navController: NavHostController) {
             Icon(Icons.Filled.Favorite, contentDescription = "Favorite", tint = Color.White)
         }
         // Dritter Button
-        IconButton(onClick = { /* Aktion für den dritten Button */ }) {
+        IconButton(onClick = { navController.navigate("screen3") }) {
             Icon(Icons.Filled.Search, contentDescription = "Search", tint = Color.White)
         }
         // Vierter Button

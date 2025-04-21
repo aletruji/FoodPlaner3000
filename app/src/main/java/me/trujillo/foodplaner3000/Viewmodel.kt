@@ -64,6 +64,10 @@ class GerichteViewModel : ViewModel() {
         return DishItem(SingleItem(name, defaultUnit = unit), quantity, unit)
     }
 
+    fun getRandomDishes(count: Int): List<Dish> {
+        return gerichte.shuffled().take(count)
+    }
+
     val gerichte = mutableStateListOf(
         Dish(
             name = "Spaghetti Bolognese",
