@@ -80,7 +80,7 @@ fun ListScreen(navController: NavHostController,
     val items = viewModel.items
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-    var deletedItem by remember { mutableStateOf<Item?>(null) }
+    var deletedItem by remember { mutableStateOf<ShoppingItem?>(null) }
     var deletedItemIndex by remember { mutableStateOf<Int?>(null) }
 
 
@@ -151,74 +151,73 @@ fun ListScreen(navController: NavHostController,
 
 
             LazyColumn(modifier = Modifier.fillMaxSize()) {
-                itemsIndexed(items = viewModel.items,
-                    key = { _, item -> item.name } // Verwende `item.name` als eindeutigen Schlüssel
+                itemsIndexed(
+                    items = viewModel.items,
+                    key = { _, item -> item.item.name } // Jetzt korrekt!
                 ) { index, item ->
                     val dismissState = rememberDismissState()
                     var showEditDialog by remember { mutableStateOf(false) }
-                    var itemToEdit by remember { mutableStateOf<Item?>(null) }
+                    var itemToEdit by remember { mutableStateOf<ShoppingItem?>(null) }
                     var showDeleteDialog by remember { mutableStateOf(false) }
-                    var itemToDelete by remember { mutableStateOf<Item?>(null) }
+                    var itemToDelete by remember { mutableStateOf<ShoppingItem?>(null) }
                     var isHandled by remember { mutableStateOf(false) }
-                    val removedItemName = item.name
+                    val removedItemName = item.item.name
                     val removedQuantity = item.quantity
                     val removedItemUnit = item.unit
+                    val removedItem = item
 
-
-
-                    if (dismissState.isDismissed(DismissDirection.EndToStart)&& !isHandled) {
+                    if (dismissState.isDismissed(DismissDirection.EndToStart) && !isHandled) {
                         isHandled = true
-                        val removedItem = item
-                        // Entferne das Item direkt aus der Liste
-                        viewModel.removeItem(index)
 
-                        println("schrit 1")
+                        val itemIndex = viewModel.items.indexOf(removedItem)
+
+                        if (itemIndex != -1) {
+                            viewModel.removeItem(itemIndex)
+                        }
 
                         scope.launch {
                             val result = snackbarHostState.showSnackbar(
-                                message = "deleted ${removedItem.name}",
+                                message = "Deleted $removedItemName",
                                 actionLabel = "Undo",
                                 duration = SnackbarDuration.Short
-
                             )
-                            println("schritt0")
                             if (result == SnackbarResult.ActionPerformed) {
-                                println("schritt1.5")
-                                // Stelle das gelöschte Item wieder her
-                                viewModel.addItem(removedItemName,removedQuantity, removedItemUnit)
-                                println("additem")
+                                val restoredItem = ShoppingItem(
+                                    item = SingleItem(name = removedItemName, defaultUnit = removedItemUnit),
+                                    quantity = removedQuantity,
+                                    unit = removedItemUnit
+                                )
+                                viewModel.addDishItem(restoredItem)
                                 isHandled = false
                                 dismissState.reset()
                             }
                             dismissState.reset()
                         }
-
-
-                        // Setze den Zustand des Swipe zurück
-
-
-
                     }
-                    if (showEditDialog == true) {
+
+                    if (showEditDialog && itemToEdit != null) {
                         EditItemDialog(
                             item = itemToEdit!!,
                             onDismiss = { showEditDialog = false },
                             onConfirm = { newName, newQuantity, newUnit ->
-                                viewModel.onEditItem(itemToEdit!!, newName, newQuantity, newUnit )
+                                viewModel.onEditItem(itemToEdit!!, newName, newQuantity, newUnit)
                                 showEditDialog = false
                             }
                         )
                     }
+
                     if (showDeleteDialog && itemToDelete != null) {
                         AlertDialog(
                             onDismissRequest = { showDeleteDialog = false },
                             title = { Text("Confirm Delete") },
-                            text = { Text("Do you want to delete ${itemToDelete!!.name}?") },
+                            text = { Text("Do you want to delete ${itemToDelete!!.item.name}?") },
                             confirmButton = {
                                 TextButton(onClick = {
-                                    viewModel.removeItem(items.indexOf(itemToDelete!!)) // Lösche das Item
-                                    showDeleteDialog = false // Schließe den Dialog
-
+                                    val itemIndex = viewModel.items.indexOf(removedItem)
+                                    if (itemIndex != -1) {
+                                        viewModel.removeItem(itemIndex)
+                                    }
+                                    showDeleteDialog = false
                                 }) {
                                     Text("Delete")
                                 }
@@ -234,94 +233,48 @@ fun ListScreen(navController: NavHostController,
                     SwipeToDismiss(
                         state = dismissState,
                         directions = setOf(
-                            DismissDirection.EndToStart, // Nach links ziehen für "Delete"
-                            DismissDirection.StartToEnd  // Nach rechts ziehen für "Edit"
+                            DismissDirection.EndToStart,
+                            DismissDirection.StartToEnd
                         ),
                         background = {
-                            val direction = dismissState.dismissDirection
                             Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(Color(0xFF212121)) // Einheitlicher Hintergrund
-                                    .padding(16.dp)
+                                modifier = Modifier.fillMaxSize().background(Color(0xFF212121)).padding(16.dp)
                             ) {
-                                when (direction) {
-                                    DismissDirection.StartToEnd -> { // Nach-Rechts-Swipen (Edit)
-                                        Text(
-                                            text = "Edit",
-                                            color = Color(0xFF4CAF50), // Grün
-                                            modifier = Modifier.align(Alignment.CenterStart) // Links platzieren
-                                        )
-                                    }
-                                    DismissDirection.EndToStart -> { // Nach-Links-Swipen (Delete)
-                                        Text(
-                                            text = "Delete",
-                                            color = Color(0xFFFF0000), // Rot
-                                            modifier = Modifier.align(Alignment.CenterEnd) // Rechts platzieren
-                                        )
-                                    }
-                                    else -> Unit // Kein Text
-                                }}
-                            },
-
-                            dismissContent = {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(8.dp)
-                                        .background(
-                                            Color(0xff565a47),
-                                            shape = MaterialTheme.shapes.medium
-                                        )
-                                        .padding(16.dp)
-                                ) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween
-                                    ) {
-                                        Text(
-                                            text = " ${item.quantity}${item.unit} ${item.name}",
-                                            fontSize = 18.sp
-                                        )
-                                        Row(
-
-                                            horizontalArrangement = Arrangement.SpaceBetween
-                                        ){
-                                        IconButton(onClick = {
-                                            itemToEdit = item
-                                            showEditDialog = true},
-                                            modifier = Modifier.size(24.dp)) {
+                                when (dismissState.dismissDirection) {
+                                    DismissDirection.StartToEnd -> Text("Edit", color = Color(0xFF4CAF50), modifier = Modifier.align(Alignment.CenterStart))
+                                    DismissDirection.EndToStart -> Text("Delete", color = Color(0xFFFF0000), modifier = Modifier.align(Alignment.CenterEnd))
+                                    else -> Unit
+                                }
+                            }
+                        },
+                        dismissContent = {
+                            Box(
+                                modifier = Modifier.fillMaxWidth().padding(8.dp).background(Color(0xff565a47), shape = MaterialTheme.shapes.medium).padding(16.dp)
+                            ) {
+                                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                    Text("${item.quantity} ${item.unit} ${item.item.name}", fontSize = 18.sp)
+                                    Row {
+                                        IconButton(onClick = { itemToEdit = item; showEditDialog = true }, modifier = Modifier.size(24.dp)) {
                                             Icon(Icons.Filled.Edit, contentDescription = "Edit")
-
                                         }
-                                            Spacer(modifier = Modifier.width(16.dp))
-
-                                            IconButton(onClick = {
-                                                itemToDelete = item
-                                               showDeleteDialog = true},
-                                                modifier = Modifier.size(24.dp)) {
-                                                Icon(Icons.Filled.Delete, contentDescription = "Delete")
-                                            }
+                                        Spacer(modifier = Modifier.width(16.dp))
+                                        IconButton(onClick = { itemToDelete = item; showDeleteDialog = true }, modifier = Modifier.size(24.dp)) {
+                                            Icon(Icons.Filled.Delete, contentDescription = "Delete")
                                         }
                                     }
                                 }
                             }
+                        }
                     )
-
 
                     if (dismissState.progress > 0.5f && dismissState.targetValue == DismissValue.DismissedToEnd) {
                         itemToEdit = item
                         showEditDialog = true
-                        scope.launch {
-                            dismissState.snapTo(DismissValue.Default) // Edited line: Reset swipe state
-                        }
+                        scope.launch { dismissState.snapTo(DismissValue.Default) }
                     }
-
-
-
-
                 }
             }
+
 
             var showAddDialog by remember { mutableStateOf(false) }
 
@@ -443,11 +396,11 @@ fun AddItemDialog(
 //################################### Edit #########################################
 @Composable
 fun EditItemDialog(
-    item: Item,
+    item: ShoppingItem,
     onDismiss: () -> Unit,
     onConfirm: (String, Int, Unit1) -> Unit
 ) {
-    var name by remember { mutableStateOf(item.name) }
+    var name by remember { mutableStateOf(item.item.name) }
     var quantity by remember { mutableStateOf(item.quantity.toString()) }
     var selectedUnit by remember { mutableStateOf(item.unit) }
 

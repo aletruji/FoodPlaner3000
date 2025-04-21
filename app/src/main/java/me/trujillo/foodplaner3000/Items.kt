@@ -1,8 +1,11 @@
 package me.trujillo.foodplaner3000
 
-data class Item(var name: String, var quantity: Int, var unit: Unit1, var gperpiece: Int? = null) {
+data class ShoppingItem(
+    val item: SingleItem,
+    val quantity: Int,
+    val unit: Unit1 )
 
-}
+
 enum class Unit1 (val conversionFactorToBase: Int) {
     g(1), kg(1000),
     l(1000), ml(1),
@@ -14,6 +17,11 @@ data class Category(
     val name: String,
     val description: String? = null
 )
+data class SingleItem(
+    val name: String,
+    val g_per_piece: Int? = null,
+    val defaultUnit: Unit1 = Unit1.x
+)
 
 data class Dish(
     val name: String,
@@ -23,7 +31,7 @@ data class Dish(
 )
 
 data class DishItem(
-    val item: Item,
-    val amount: Int, // Menge
-    val unit: Unit1 // Einheit
+    val base: SingleItem,
+    val quantity: Int,
+    val unit: Unit1
 )
