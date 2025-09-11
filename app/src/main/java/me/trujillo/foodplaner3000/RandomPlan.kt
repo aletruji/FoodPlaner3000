@@ -61,7 +61,7 @@ fun RandomPlan(navController: NavHostController, viewModel: GerichteViewModel = 
         modifier = Modifier
             .fillMaxSize()
     ) {
-        // 🔸 Header oben
+        // Header oben
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -131,7 +131,7 @@ fun RandomPlan(navController: NavHostController, viewModel: GerichteViewModel = 
 
             Spacer(modifier = Modifier.size(16.dp))
 
-            // 🔸 Liste der Gerichte
+            //  Liste der Gerichte
             Column {
                 gerichte.forEach { dish ->
                     Text(
@@ -144,7 +144,7 @@ fun RandomPlan(navController: NavHostController, viewModel: GerichteViewModel = 
             }
         }
 
-        // 🔸 Floating Button etwas höher
+        // Floating Button etwas höher
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -166,7 +166,7 @@ fun RandomPlan(navController: NavHostController, viewModel: GerichteViewModel = 
             }
         }
 
-        // 🔸 Footer unten
+        // Footer unten
         Box(
             modifier = Modifier
                 .fillMaxWidth()
