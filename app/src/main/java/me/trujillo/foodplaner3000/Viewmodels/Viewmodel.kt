@@ -1,10 +1,28 @@
-package me.trujillo.foodplaner3000
+package me.trujillo.foodplaner3000.Viewmodels
 
-import android.content.ClipData
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import me.trujillo.foodplaner3000.Category
+import me.trujillo.foodplaner3000.Dish
+import me.trujillo.foodplaner3000.DishItem
+import me.trujillo.foodplaner3000.ShoppingItem
+import me.trujillo.foodplaner3000.SingleItem
+import me.trujillo.foodplaner3000.data.Repositorys.ShoppingListRepository
+import me.trujillo.foodplaner3000.data.db.entities.ShoppingList
 
 
+class ShoppingViewModel(private val repo: ShoppingListRepository) : ViewModel() {
+    val items = repo.allItems
+
+    fun addItem(item: ShoppingList) = viewModelScope.launch { repo.add(item) }
+    fun removeItem(item: ShoppingList) = viewModelScope.launch { repo.remove(item) }
+    fun updateItem(item: ShoppingList) = viewModelScope.launch { repo.update(item) }
+}
+
+/*
 class ItemViewModel : ViewModel() {
 
     private var _items = mutableStateListOf(
@@ -184,3 +202,4 @@ val itemList = listOf(
     SingleItem(name="Schokolade", g_per_piece = 100, defaultUnit = Unit1.g),
     SingleItem(name="Nüsse", g_per_piece = 200, defaultUnit = Unit1.g)
 )
+*/

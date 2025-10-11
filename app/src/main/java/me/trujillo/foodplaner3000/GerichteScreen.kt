@@ -55,6 +55,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.lifecycle.viewmodel.compose.viewModel
+import me.trujillo.foodplaner3000.Viewmodels.GerichteViewModel
+import me.trujillo.foodplaner3000.Viewmodels.ItemViewModel
 
 
 @Composable

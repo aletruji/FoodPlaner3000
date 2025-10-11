@@ -6,12 +6,7 @@ data class ShoppingItem(
     val unit: Unit1 )
 
 
-enum class Unit1 (val conversionFactorToBase: Int) {
-    g(1), kg(1000),
-    l(1000), ml(1),
-    EL(15), TL(5),
-    x( 1)
-}
+
 
 data class Category(
     val name: String,

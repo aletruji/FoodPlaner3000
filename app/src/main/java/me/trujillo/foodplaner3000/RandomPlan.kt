@@ -29,10 +29,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.semantics.Role.Companion.Button
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -43,7 +41,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import me.trujillo.foodplaner3000.BottomIconButtons
 import me.trujillo.foodplaner3000.Dish
-import me.trujillo.foodplaner3000.GerichteViewModel
+import me.trujillo.foodplaner3000.Viewmodels.GerichteViewModel
 
 @Composable
 fun RandomPlan(navController: NavHostController, viewModel: GerichteViewModel = viewModel()){
