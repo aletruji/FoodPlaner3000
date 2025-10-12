@@ -1,5 +1,5 @@
 package me.trujillo.foodplaner3000
-
+/*
 data class ShoppingItem(
     val item: SingleItem,
     val quantity: Int,
@@ -30,3 +30,4 @@ data class DishItem(
     val quantity: Int,
     val unit: Unit1
 )
+*/

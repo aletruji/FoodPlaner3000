@@ -2,12 +2,13 @@ package me.trujillo.foodplaner3000.data.db.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import me.trujillo.foodplaner3000.data.enums.Unit
+import me.trujillo.foodplaner3000.data.enums.Unit1
 
 @Entity
 data class ShoppingList(
     @PrimaryKey(autoGenerate = true )val id: Int = 0,
     val name: String,
     val quantity: Int,
-    val unit: Unit
+    val unit: Unit1
 )
+
