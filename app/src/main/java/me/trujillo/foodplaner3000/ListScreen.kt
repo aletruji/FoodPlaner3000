@@ -101,55 +101,7 @@ fun ListScreen(navController: NavHostController){
         .fillMaxSize()
     ){
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(0.2f)
-                .background(Color(0xFFFFA500))
-                .padding(7.dp)
-        ) {
-            Text(
-                text = "Food Planer 3000",
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .offset(y = (-20.dp)),
-                color = Color.White,
-                fontSize = 25.sp,
-                fontWeight = FontWeight.Bold,
-                fontStyle = FontStyle.Italic
 
-
-            )
-            Box(
-                modifier = Modifier
-                    .background(Color(0xFF212121), shape = RoundedCornerShape(16.dp))
-                    .align(Alignment.BottomStart)
-                    .padding(10.dp)
-            ) {
-                Text(
-                    text = "Einkaufsliste...               ",
-
-                    color = Color.White
-                )
-
-
-            }
-
-                SnackbarHost(
-                    hostState = snackbarHostState,
-                    modifier = Modifier
-                        .size(180.dp, 80.dp)
-                        .align(Alignment.BottomEnd)
-                        .padding(top = 6.dp)
-
-                )
-
-        }
-
-        Divider(
-            thickness = 15.dp, // Dicke der Linie
-            color = Color(0xff8BC34A) // Farbe der Linie
-        )
 
         Box(
             modifier = Modifier
@@ -402,36 +354,6 @@ fun UnitDropdownMenu(
  */
 //################################### BottomIconButtons #########################################
 
-
-@Composable
-fun BottomIconButtons(navController: NavHostController) {
-    // Row für die Icons am unteren Rand der App
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()  // Füllt die gesamte Breite aus
-            .padding(16.dp), // Optionales Padding
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-
-    ) {
-        // Erster Button
-        IconButton(onClick = { navController.navigate("screen1") }) {
-            Icon(Icons.Filled.Home, contentDescription = "Home", tint = Color.White)
-        }
-        // Zweiter Button
-        IconButton(onClick = { navController.navigate("screen2") }) {
-            Icon(Icons.Filled.Favorite, contentDescription = "Favorite", tint = Color.White)
-        }
-        // Dritter Button
-        IconButton(onClick = { navController.navigate("screen3") }) {
-            Icon(Icons.Filled.Search, contentDescription = "Search", tint = Color.White)
-        }
-        // Vierter Button
-        IconButton(onClick = { /* Aktion für den vierten Button */ }) {
-            Icon(Icons.Filled.Settings, contentDescription = "Settings", tint = Color.White)
-        }
-    }
-}
 
 //################################### Prewiev #########################################
 
