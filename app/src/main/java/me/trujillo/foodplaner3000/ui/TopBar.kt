@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.sp
 
 
 @Composable
-fun TopSection(snackbarHostState: SnackbarHostState) {
+fun TopSection(snackbarHostState: SnackbarHostState, title: String = "Einkaufsliste...") {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -49,7 +49,7 @@ fun TopSection(snackbarHostState: SnackbarHostState) {
                 .padding(10.dp)
         ) {
             Text(
-                text = "Einkaufsliste...",
+                text = title,
                 color = Color.White
             )
         }

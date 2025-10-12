@@ -20,16 +20,22 @@ import me.trujillo.foodplaner3000.ui.BottomIconButtons
 import me.trujillo.foodplaner3000.ui.TopSection
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.remember
+import androidx.navigation.compose.currentBackStackEntryAsState
 
 
 @Composable
 fun MainApp(snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }) {
     val navController = rememberNavController()
+    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route ?: "screen1"
     Scaffold(
         topBar = {
 Column{
-
-            TopSection(snackbarHostState)
+    val title = when (currentRoute) {
+        "screen1" -> "Einkaufsliste..."
+        "screen2" -> "Gerichteliste..."
+        "screen3" -> "Randomizer..."
+        else -> "Food Planer 3000"}
+            TopSection(snackbarHostState, title)
     HorizontalDivider(
                 thickness = 15.dp,
                 color = Color(0xff8BC34A)
@@ -45,6 +51,7 @@ Column{
                 BottomIconButtons(navController)
             }
         }
+
     )
     { innerPadding ->
         NavHost(
