@@ -37,6 +37,7 @@ import me.trujillo.foodplaner3000.Viewmodels.ShoppingViewModelFactory
 import me.trujillo.foodplaner3000.data.Repositorys.ShoppingListRepository
 import me.trujillo.foodplaner3000.data.db.AppDatabase
 import me.trujillo.foodplaner3000.ui.IconButtonAdd
+import me.trujillo.foodplaner3000.ui.components.ShoppingListItem
 
 
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -76,26 +77,12 @@ fun ListScreen(navController: NavHostController){
 
 
             LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(items = items) { item ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "${item.quantity} ${item.unit.name} ${item.name}",
-                            color = Color.White,
-                            fontSize = 18.sp
-                        )
-                        IconButton(onClick = { viewModel.removeItem(item) }) {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = "Delete",
-                                tint = Color.Red
-                            )
-                        }
-                    }
+                items(items = items, key = { it.id }) { item ->
+                    ShoppingListItem(
+                        item = item,
+                        onEdit = { /* TODO: Dialog öffnen */ },
+                        onDelete = { viewModel.removeItem(item) }
+                    )
                 }
             }
 
