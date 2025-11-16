@@ -1,8 +1,8 @@
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android") version "2.0.0"
-    id("org.jetbrains.kotlin.plugin.compose") version "2.0.0"
-    id("com.google.devtools.ksp")
+    id("org.jetbrains.kotlin.android") version "2.2.21"
+    id("org.jetbrains.kotlin.plugin.compose") version "2.2.21"
+    id("kotlin-kapt")
 
 
 
@@ -11,12 +11,12 @@ plugins {
 
 android {
     namespace = "me.trujillo.foodplaner3000"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "me.trujillo.foodplaner3000"
         minSdk = 25
-        targetSdk = 34
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -73,7 +73,8 @@ dependencies {
     implementation("androidx.room:room-runtime-android:2.8.2")
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.room:room-ktx:2.8.2")
-    ksp("androidx.room:room-compiler:2.8.2")
+    kapt("androidx.room:room-compiler:2.8.2")
+
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")

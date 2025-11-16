@@ -39,7 +39,7 @@ Column{
     HorizontalDivider(
                 thickness = 15.dp,
                 color = Color(0xff8BC34A)
-            )// <- hier fügst du dein bestehendes Composable ein
+            )
         }},
         bottomBar = {
             Box(
@@ -60,7 +60,7 @@ Column{
             modifier = Modifier.padding(innerPadding)
         ) {
             composable("screen1") { ListScreen(navController) }
-            //  composable("screen2") { GerichteScreen(navController) }
+            composable("screen2") { GerichteScreen(navController) }
             // composable("screen3") { RandomPlan(navController) }
         }
     }

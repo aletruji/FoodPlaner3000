@@ -7,9 +7,16 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import me.trujillo.foodplaner3000.data.db.converters.Converters
 import me.trujillo.foodplaner3000.data.db.dao.ShoppingListDao
+import me.trujillo.foodplaner3000.data.db.entities.Category
+import me.trujillo.foodplaner3000.data.db.entities.Dish
+import me.trujillo.foodplaner3000.data.db.entities.DishCategory
+import me.trujillo.foodplaner3000.data.db.entities.DishIngredient
+import me.trujillo.foodplaner3000.data.db.entities.Ingredient
 import me.trujillo.foodplaner3000.data.db.entities.ShoppingList
 
-@Database(entities = [ShoppingList::class], version = 1)
+@Database(entities = [ShoppingList::class, Dish::class,
+    Category::class, DishCategory::class, Ingredient::class,
+    DishIngredient::class], version = 2)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun shoppingListDao(): ShoppingListDao
@@ -21,7 +28,7 @@ abstract class AppDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "Footdatabase").build()
+                    "Footdatabase").fallbackToDestructiveMigration().build()
                     INSTANCE = instance
                     instance
 
