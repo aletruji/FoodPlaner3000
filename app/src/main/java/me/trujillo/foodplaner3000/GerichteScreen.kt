@@ -27,6 +27,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,14 +35,27 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import me.trujillo.foodplaner3000.Viewmodels.DishViewModel
+import me.trujillo.foodplaner3000.Viewmodels.DishViewModelFactory
+import me.trujillo.foodplaner3000.Viewmodels.ShoppingViewModel
+import me.trujillo.foodplaner3000.Viewmodels.ShoppingViewModelFactory
+import me.trujillo.foodplaner3000.data.Repositorys.DishRepository
+import me.trujillo.foodplaner3000.data.Repositorys.ShoppingListRepository
+import me.trujillo.foodplaner3000.data.db.AppDatabase
 import me.trujillo.foodplaner3000.data.db.entities.Dish
+import me.trujillo.foodplaner3000.data.enums.Unit1
+import me.trujillo.foodplaner3000.ui.AddDishDialog
+import me.trujillo.foodplaner3000.ui.IconButtonAddDish
+
 import me.trujillo.foodplaner3000.ui.SimpleFilterDropdown
 
 
@@ -55,6 +69,10 @@ fun GerichteScreen(navController: NavHostController){
         Dish(name = "Lachsnudeln", description = null, instructions = null),
         Dish(name = "Burger", description = null, instructions = null),
         Dish(name = "Tunfisch Salat", description = null, instructions = null),
+        Dish(name = " aaBurger", description = null, instructions = null),
+        Dish(name = "aa Salat", description = null, instructions = null),
+        Dish(name = " bb Burger", description = null, instructions = null),
+        Dish(name = "bb Tunfisch Salat", description = null, instructions = null),
         Dish(name = "Fischstäbchen mit Spinat", description = null, instructions = null),
         Dish(name = "Pad Thai", description = null, instructions = null),
         Dish(name = "Tofu Bolognese", description = null, instructions = null)
@@ -63,6 +81,29 @@ fun GerichteScreen(navController: NavHostController){
     var showAddPlateDialog by remember { mutableStateOf(false) }
     var text by remember { mutableStateOf("")}
     var filter by remember {mutableStateOf("Dish")}
+    var showAddDishDialog by remember { mutableStateOf(false) }
+
+
+
+
+
+
+
+
+    val context = LocalContext.current
+    val db = AppDatabase.getDatabase(context)
+
+    val dishRepo = DishRepository(
+        db.dishDao(),
+        db.categoryDao(),
+        db.ingredientDao(),
+        db.dishRelationsDao()
+    )
+
+    val dishViewModel: DishViewModel = viewModel(
+        factory = DishViewModelFactory(dishRepo)
+    )
+    val dishes by dishViewModel.dishes.collectAsState(initial = emptyList())
 
     Column(modifier = Modifier
         .fillMaxSize()
@@ -120,12 +161,15 @@ fun GerichteScreen(navController: NavHostController){
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
 
-        ){
+        ){Box(  modifier = Modifier
+            .fillMaxWidth()
+            .weight(1f)
+            .background(Color(0xFF212121))){
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement =  Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
-            ) { items(testgerichte){
+            ) { items(dishes){
                 item-> Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -142,12 +186,16 @@ fun GerichteScreen(navController: NavHostController){
                         text = "${item.name} ",
                         color = Color.White,
                         fontSize = 18.sp,
-                        modifier = Modifier.padding(8.dp)
+                        modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp)
                     )
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         IconButton(
-                            onClick = {  },
+                            onClick = {
+
+
+
+                            },
                             modifier = Modifier.size(28.dp)
                         ) {
                             Icon(
@@ -160,7 +208,11 @@ fun GerichteScreen(navController: NavHostController){
                         Spacer(modifier = Modifier.width(8.dp))
 
                         IconButton(
-                            onClick = {  },
+                            onClick = {
+                                dishViewModel.deleteDish(item)
+
+
+                            },
                             modifier = Modifier.size(28.dp)
                         ) {
                             Icon(
@@ -176,7 +228,29 @@ fun GerichteScreen(navController: NavHostController){
 
             }
 
-        }
+            IconButtonAddDish(
+                onClick = { showAddDishDialog = true }
+            )
+
+            if (showAddDishDialog) {
+                AddDishDialog(
+                    onDismiss = { showAddDishDialog = false },
+                    onSave = { name, description, instructions, categories, ingredients ->
+                        dishViewModel.addDish(
+                            name = name,
+                            description = description,
+                            instructions = instructions,
+                            categories = categories,
+                            ingredients = ingredients
+                        )
+
+                        showAddDishDialog = false
+                    }
+                )
+            }
+
+        }}
+
 
 
 

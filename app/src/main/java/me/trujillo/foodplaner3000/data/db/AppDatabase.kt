@@ -6,6 +6,10 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import me.trujillo.foodplaner3000.data.db.converters.Converters
+import me.trujillo.foodplaner3000.data.db.dao.CategoryDao
+import me.trujillo.foodplaner3000.data.db.dao.DishDao
+import me.trujillo.foodplaner3000.data.db.dao.DishRelationsDao
+import me.trujillo.foodplaner3000.data.db.dao.IngredientDao
 import me.trujillo.foodplaner3000.data.db.dao.ShoppingListDao
 import me.trujillo.foodplaner3000.data.db.entities.Category
 import me.trujillo.foodplaner3000.data.db.entities.Dish
@@ -20,6 +24,10 @@ import me.trujillo.foodplaner3000.data.db.entities.ShoppingList
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun shoppingListDao(): ShoppingListDao
+    abstract fun dishDao(): DishDao
+    abstract fun categoryDao(): CategoryDao
+    abstract fun ingredientDao(): IngredientDao
+    abstract fun dishRelationsDao(): DishRelationsDao
     companion object{
         @Volatile
         private var INSTANCE:AppDatabase?= null
