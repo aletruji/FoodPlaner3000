@@ -24,12 +24,15 @@ import me.trujillo.foodplaner3000.data.enums.Unit1
 fun AddItemDialog(
 
     onDismiss: () -> Unit,
-    onAddItem: (String, Int, Unit1) -> Unit
+    onConfirm: (String, Int, Unit1) -> Unit,
+    initialName: String = "",
+    initialQuantity: Int = 1,
+    initialUnit: Unit1 = Unit1.x
 ) {
-    var name by remember { mutableStateOf("") }
-    var quantity by remember { mutableStateOf(0) }
-    var expanded by remember { mutableStateOf(false) } // Steuert die Sichtbarkeit des Menüs
-    var selectedUnit by remember { mutableStateOf(Unit1.x) } // Aktuell ausgewählte Einheit
+    var name by remember { mutableStateOf(initialName) }
+    var quantity by remember { mutableStateOf(initialQuantity) }
+    var selectedUnit by remember { mutableStateOf(initialUnit) }
+
 
 
 
@@ -50,6 +53,7 @@ fun AddItemDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
+
                 OutlinedTextField(
                     value = if (quantity == 0) "" else quantity.toString(), // Zeige leeres Feld, wenn 0
                     onValueChange = {
@@ -62,6 +66,7 @@ fun AddItemDialog(
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
+
                 UnitDropdownMenu(selectedUnit = selectedUnit,
                     onUnitSelected = { selectedUnit = it } )
 
@@ -74,10 +79,10 @@ fun AddItemDialog(
             TextButton(onClick = {
                 if (name.isNotBlank()) {
                     val finalQuantity = if (quantity > 0) quantity else 1 // Standardwert 1 setzen
-                    onAddItem(name, finalQuantity, selectedUnit)
+                    onConfirm(name, quantity, selectedUnit)
                 }
             }) {
-                Text("Add")
+                Text("Save")
             }
         },
         dismissButton = {

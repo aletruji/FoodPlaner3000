@@ -20,7 +20,7 @@ import me.trujillo.foodplaner3000.data.db.entities.ShoppingList
 
 @Database(entities = [ShoppingList::class, Dish::class,
     Category::class, DishCategory::class, Ingredient::class,
-    DishIngredient::class], version = 2)
+    DishIngredient::class], version = 3)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun shoppingListDao(): ShoppingListDao

@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -67,7 +68,7 @@ fun IconButtonAdd(viewModel: ShoppingViewModel) {
         if (showAddDialog) {
             AddItemDialog(
 
-                onAddItem = { name, quantity, unit ->
+                onConfirm = { name, quantity, unit ->
                     val newItem = ShoppingList(
                         name = name,
                         quantity = quantity,
@@ -110,25 +111,36 @@ fun IconButtonAddDish(onClick: () -> Unit) {
 
 @Composable
 fun AddDishDialog(
+    initialName: String = "",
+    initialDescription: String = "",
+    initialInstructions: String = "",
+    initialCategories: List<String> = emptyList(),
+    initialIngredients: List<Pair<String, Pair<Double, Unit1>>> = emptyList(),
     onDismiss: () -> Unit,
     onSave: (
         String,                 // name
         String?,                // description
         String?,                // instructions
         List<String>,           // categories
-        List<Pair<String, Pair<Double, Unit1>>> // ingredients
+        List<Pair<String, Pair<Double, Unit1>>>
     ) -> Unit
 ) {
-    var name by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var instructions by remember { mutableStateOf("") }
+
+
+    var name by remember { mutableStateOf(initialName) }
+    var description by remember { mutableStateOf(initialDescription) }
+    var instructions by remember { mutableStateOf(initialInstructions) }
+
+    var categories by remember { mutableStateOf(initialCategories) }
+    var ingredients by remember { mutableStateOf(initialIngredients) }
+
 
     // Kategorien
-    var categories by remember { mutableStateOf(listOf<String>()) }
+
     var newCategory by remember { mutableStateOf("") }
 
     // Zutaten
-    var ingredients by remember { mutableStateOf(listOf<Pair<String, Pair<Double, Unit1>>>()) }
+
     var newIngredientName by remember { mutableStateOf("") }
     var newIngredientQuantity by remember { mutableStateOf("") }
     var newIngredientUnit by remember { mutableStateOf(Unit1.g) }
@@ -182,8 +194,19 @@ fun AddDishDialog(
                 Text("Kategorien:", fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
 
                 categories.forEach { cat ->
-                    Text("• $cat", color = Color.DarkGray)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("• $cat", color = Color.DarkGray)
+                        Spacer(Modifier.width(8.dp))
+                        IconButton(onClick = {
+                            categories = categories - cat
+                        }) {
+                            Icon(Icons.Default.Delete, contentDescription = "delete", tint = Color.Red)
+                        }
+                    }
                 }
+
 
                 Spacer(Modifier.height(10.dp))
 
@@ -218,10 +241,21 @@ fun AddDishDialog(
                 Text("Zutaten:", fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
 
                 ingredients.forEach { ing ->
-                    val (name, qtyUnit) = ing
+                    val (iname, qtyUnit) = ing
                     val (qty, unit) = qtyUnit
-                    Text("• $name  ($qty ${unit.name})", color = Color.DarkGray)
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("• $iname ($qty ${unit.name})", color = Color.DarkGray)
+                        Spacer(Modifier.width(8.dp))
+
+                        IconButton(onClick = {
+                            ingredients = ingredients - ing
+                        }) {
+                            Icon(Icons.Default.Delete, contentDescription = "delete ingredient", tint = Color.Red)
+                        }
+                    }
                 }
+
 
                 Spacer(Modifier.height(10.dp))
 

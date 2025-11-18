@@ -1,7 +1,6 @@
-package me.trujillo.foodplaner3000
+package me.trujillo.foodplaner3000.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,8 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -37,7 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,42 +42,25 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import me.trujillo.foodplaner3000.Viewmodels.DishViewModel
 import me.trujillo.foodplaner3000.Viewmodels.DishViewModelFactory
-import me.trujillo.foodplaner3000.Viewmodels.ShoppingViewModel
-import me.trujillo.foodplaner3000.Viewmodels.ShoppingViewModelFactory
 import me.trujillo.foodplaner3000.data.Repositorys.DishRepository
-import me.trujillo.foodplaner3000.data.Repositorys.ShoppingListRepository
 import me.trujillo.foodplaner3000.data.db.AppDatabase
 import me.trujillo.foodplaner3000.data.db.entities.Dish
-import me.trujillo.foodplaner3000.data.enums.Unit1
 import me.trujillo.foodplaner3000.ui.AddDishDialog
 import me.trujillo.foodplaner3000.ui.IconButtonAddDish
-
 import me.trujillo.foodplaner3000.ui.SimpleFilterDropdown
 
 
 @Composable
 fun GerichteScreen(navController: NavHostController){
-    val testgerichte : List<Dish> = listOf(
-        Dish(name = "Reis mit Bohnen", description = null, instructions = null),
-        Dish(name = "Enchilladas", description = null, instructions = null),
-        Dish(name = "Kötbulla", description = null, instructions = null),
-        Dish(name = "Steak", description = null, instructions = null),
-        Dish(name = "Lachsnudeln", description = null, instructions = null),
-        Dish(name = "Burger", description = null, instructions = null),
-        Dish(name = "Tunfisch Salat", description = null, instructions = null),
-        Dish(name = " aaBurger", description = null, instructions = null),
-        Dish(name = "aa Salat", description = null, instructions = null),
-        Dish(name = " bb Burger", description = null, instructions = null),
-        Dish(name = "bb Tunfisch Salat", description = null, instructions = null),
-        Dish(name = "Fischstäbchen mit Spinat", description = null, instructions = null),
-        Dish(name = "Pad Thai", description = null, instructions = null),
-        Dish(name = "Tofu Bolognese", description = null, instructions = null)
-    )
+
 
     var showAddPlateDialog by remember { mutableStateOf(false) }
     var text by remember { mutableStateOf("")}
     var filter by remember {mutableStateOf("Dish")}
     var showAddDishDialog by remember { mutableStateOf(false) }
+    var dishToEdit by remember { mutableStateOf<Dish?>(null) }
+
+
 
 
 
@@ -104,6 +83,8 @@ fun GerichteScreen(navController: NavHostController){
         factory = DishViewModelFactory(dishRepo)
     )
     val dishes by dishViewModel.dishes.collectAsState(initial = emptyList())
+
+
 
     Column(modifier = Modifier
         .fillMaxSize()
@@ -146,7 +127,7 @@ fun GerichteScreen(navController: NavHostController){
                 selected = filter,
                 onSelected = { filter = it },
 
-            )
+                )
 
         }
 
@@ -192,7 +173,7 @@ fun GerichteScreen(navController: NavHostController){
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         IconButton(
                             onClick = {
-
+                                dishToEdit = item
 
 
                             },
@@ -232,22 +213,40 @@ fun GerichteScreen(navController: NavHostController){
                 onClick = { showAddDishDialog = true }
             )
 
-            if (showAddDishDialog) {
-                AddDishDialog(
-                    onDismiss = { showAddDishDialog = false },
-                    onSave = { name, description, instructions, categories, ingredients ->
-                        dishViewModel.addDish(
-                            name = name,
-                            description = description,
-                            instructions = instructions,
-                            categories = categories,
-                            ingredients = ingredients
-                        )
+            if (dishToEdit != null) {
 
-                        showAddDishDialog = false
+                val categories by dishViewModel
+                    .getCategoriesForDish(dishToEdit!!.id)
+                    .collectAsState(initial = emptyList())
+
+                val ingredients by dishViewModel
+                    .getIngredientsForDish(dishToEdit!!.id)
+                    .collectAsState(initial = emptyList())
+
+                AddDishDialog(
+                    initialName = dishToEdit!!.name,
+                    initialDescription = dishToEdit!!.description ?: "",
+                    initialInstructions = dishToEdit!!.instructions ?: "",
+                    initialCategories = categories,
+                    initialIngredients = ingredients.map {
+                        it.name to ((it.quantity ?: 0.0) to it.unit)
+                    },
+                    onDismiss = { dishToEdit = null },
+                    onSave = { name, desc, instr, cats, ings ->
+                        dishViewModel.updateDish(
+                            dishToEdit!!.copy(
+                                name = name,
+                                description = desc,
+                                instructions = instr
+                            ),
+                            cats,
+                            ings
+                        )
+                        dishToEdit = null
                     }
                 )
             }
+
 
         }}
 

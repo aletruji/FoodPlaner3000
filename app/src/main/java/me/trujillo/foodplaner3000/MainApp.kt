@@ -1,6 +1,7 @@
 package me.trujillo.foodplaner3000
 
 
+import RandomPlan
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,8 @@ import me.trujillo.foodplaner3000.ui.TopSection
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.remember
 import androidx.navigation.compose.currentBackStackEntryAsState
+import me.trujillo.foodplaner3000.ui.screens.GerichteScreen
+import me.trujillo.foodplaner3000.ui.screens.ListScreen
 
 
 @Composable
@@ -61,7 +64,7 @@ Column{
         ) {
             composable("screen1") { ListScreen(navController) }
             composable("screen2") { GerichteScreen(navController) }
-            // composable("screen3") { RandomPlan(navController) }
+             composable("screen3") { RandomPlan(navController) }
         }
     }
 }
