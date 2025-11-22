@@ -46,22 +46,28 @@ fun DishImagePicker(
         }
     }
 
-    // CAMERA PICKER
-    var photoUri by remember { mutableStateOf<Uri?>(null) }
+    // Fotodatei anlegen
+    val photoFile = remember {
+        File(context.filesDir, "dish_cam_${System.currentTimeMillis()}.jpg")
+    }
+
+// NON-NULL Uri → kein Smart-Cast Fehler
+    val photoUri: Uri = remember {
+        FileProvider.getUriForFile(
+            context,
+            context.packageName + ".provider",
+            photoFile
+        )
+    }
 
     val cameraLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.TakePicture()
     ) { success ->
-        if (success && photoUri != null) {
-            onImageSelected(photoUri!!.path!!)
+        if (success) {
+            onImageSelected(photoFile.absolutePath)
         }
     }
 
-    fun launchCamera() {
-        val file = File(context.filesDir, "dish_${System.currentTimeMillis()}.jpg")
-        photoUri = FileProvider.getUriForFile(context, context.packageName + ".provider", file)
-        cameraLauncher.launch(photoUri)
-    }
 
     Column(modifier = Modifier.fillMaxWidth()) {
 
@@ -92,7 +98,7 @@ fun DishImagePicker(
             androidx.compose.material3.Button(onClick = { galleryLauncher.launch("image/*") }) {
                 Text("Galerie")
             }
-            androidx.compose.material3.Button(onClick = { launchCamera() }) {
+            androidx.compose.material3.Button(onClick = { cameraLauncher.launch(photoUri)}) {
                 Text("Kamera")
             }
         }

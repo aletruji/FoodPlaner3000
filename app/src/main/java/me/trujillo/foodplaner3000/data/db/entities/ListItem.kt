@@ -18,7 +18,8 @@ data class Dish(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val name: String,
     val description: String?,
-    val instructions: String?
+    val instructions: String?,
+    val imagePath: String? = null
 )
 
 @Entity

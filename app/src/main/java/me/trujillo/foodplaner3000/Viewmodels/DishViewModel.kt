@@ -42,8 +42,7 @@ class DishViewModel(
     fun updateDish(
         updatedDish: Dish,
         categories: List<String>,
-        ingredients: List<Pair<String, Pair<Double, Unit1>>>,
-        imagePath: String?
+        ingredients: List<Pair<String, Pair<Double, Unit1>>>
     ) {
         viewModelScope.launch {
             repo.updateDish(updatedDish, categories, ingredients)

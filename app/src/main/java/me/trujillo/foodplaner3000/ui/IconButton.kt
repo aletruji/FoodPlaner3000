@@ -119,13 +119,15 @@ fun AddDishDialog(
     initialInstructions: String = "",
     initialCategories: List<String> = emptyList(),
     initialIngredients: List<Pair<String, Pair<Double, Unit1>>> = emptyList(),
+    initialImagePath: String? = null,
     onDismiss: () -> Unit,
     onSave: (
         String,                 // name
         String?,                // description
         String?,                // instructions
         List<String>,           // categories
-        List<Pair<String, Pair<Double, Unit1>>>
+        List<Pair<String, Pair<Double, Unit1>>>,
+            String? //bildpfad
     ) -> Unit
 ) {
 
@@ -137,7 +139,7 @@ fun AddDishDialog(
     var categories by remember { mutableStateOf(initialCategories) }
     var ingredients by remember { mutableStateOf(initialIngredients) }
 
-
+    var imagePath by remember { mutableStateOf(initialImagePath) }
     // Kategorien
 
     var newCategory by remember { mutableStateOf("") }
@@ -147,7 +149,7 @@ fun AddDishDialog(
     var newIngredientName by remember { mutableStateOf("") }
     var newIngredientQuantity by remember { mutableStateOf("") }
     var newIngredientUnit by remember { mutableStateOf(Unit1.g) }
-    var imagePath by remember { mutableStateOf(initialImagePath) }
+
 
     DishImagePicker(
         imagePath = imagePath,
@@ -331,7 +333,8 @@ fun AddDishDialog(
                                 description,
                                 instructions,
                                 categories,
-                                ingredients
+                                ingredients,
+                                imagePath
                             )
                         }
                         onDismiss()

@@ -230,22 +230,25 @@ fun GerichteScreen(navController: NavHostController){
                         initialIngredients = ingredients!!.map {
                             it.name to ((it.quantity ?: 0.0) to it.unit)
                         },
+                        initialImagePath = dishToEdit!!.imagePath,   // ← WICHTIG!
                         onDismiss = { dishToEdit = null },
-                        onSave = { name, desc, instr, cats, ings ->
+                        onSave = { name, desc, instr, cats, ings, imagePath ->
                             dishViewModel.updateDish(
                                 dishToEdit!!.copy(
                                     name = name,
                                     description = desc,
                                     instructions = instr,
-                                    imagePath = img
+                                    imagePath = imagePath       // ← WICHTIG!
                                 ),
                                 cats,
                                 ings
+
                             )
                             dishToEdit = null
                         }
                     )
                 }
+
             }
 
 
@@ -256,13 +259,22 @@ fun GerichteScreen(navController: NavHostController){
                     initialInstructions = "",
                     initialCategories = emptyList(),
                     initialIngredients = emptyList(),
+                    initialImagePath = null,               // ← WICHTIG!
                     onDismiss = { showAddDishDialog = false },
-                    onSave = { name, desc, instr, cats, ings ->
-                        dishViewModel.addDish(name, desc, instr, cats, ings)
+                    onSave = { name, desc, instr, cats, ings, imagePath ->
+                        dishViewModel.addDish(
+                            name,
+                            desc,
+                            instr,
+                            cats,
+                            ings,
+                            imagePath                     // ← WICHTIG!
+                        )
                         showAddDishDialog = false
                     }
                 )
             }
+
 
 
 
