@@ -15,7 +15,9 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -35,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import me.trujillo.foodplaner3000.DishImagePicker
 import me.trujillo.foodplaner3000.Viewmodels.ShoppingViewModel
 import me.trujillo.foodplaner3000.data.db.entities.ShoppingList
 import me.trujillo.foodplaner3000.data.enums.Unit1
@@ -144,12 +147,23 @@ fun AddDishDialog(
     var newIngredientName by remember { mutableStateOf("") }
     var newIngredientQuantity by remember { mutableStateOf("") }
     var newIngredientUnit by remember { mutableStateOf(Unit1.g) }
+    var imagePath by remember { mutableStateOf(initialImagePath) }
+
+    DishImagePicker(
+        imagePath = imagePath,
+        onImageSelected = { imagePath = it }
+    )
+
+
 
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Neues Gericht") },
         text = {
-            Column(modifier = Modifier.fillMaxWidth()) {
+            Column( modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(max = 500.dp)         // maximale Dialoghöhe
+                .verticalScroll(rememberScrollState())) {
 
                 // -------------------------------
                 // NAME

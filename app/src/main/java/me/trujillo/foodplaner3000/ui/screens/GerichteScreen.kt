@@ -215,37 +215,55 @@ fun GerichteScreen(navController: NavHostController){
 
             if (dishToEdit != null) {
 
-                val categories by dishViewModel
-                    .getCategoriesForDish(dishToEdit!!.id)
-                    .collectAsState(initial = emptyList())
+                val categoriesFlow = dishViewModel.getCategoriesForDish(dishToEdit!!.id)
+                val ingredientsFlow = dishViewModel.getIngredientsForDish(dishToEdit!!.id)
 
-                val ingredients by dishViewModel
-                    .getIngredientsForDish(dishToEdit!!.id)
-                    .collectAsState(initial = emptyList())
+                val categories by categoriesFlow.collectAsState(initial = null)
+                val ingredients by ingredientsFlow.collectAsState(initial = null)
 
+                if (categories != null && ingredients != null) {
+                    AddDishDialog(
+                        initialName = dishToEdit!!.name,
+                        initialDescription = dishToEdit!!.description ?: "",
+                        initialInstructions = dishToEdit!!.instructions ?: "",
+                        initialCategories = categories!!,
+                        initialIngredients = ingredients!!.map {
+                            it.name to ((it.quantity ?: 0.0) to it.unit)
+                        },
+                        onDismiss = { dishToEdit = null },
+                        onSave = { name, desc, instr, cats, ings ->
+                            dishViewModel.updateDish(
+                                dishToEdit!!.copy(
+                                    name = name,
+                                    description = desc,
+                                    instructions = instr,
+                                    imagePath = img
+                                ),
+                                cats,
+                                ings
+                            )
+                            dishToEdit = null
+                        }
+                    )
+                }
+            }
+
+
+            if (showAddDishDialog) {
                 AddDishDialog(
-                    initialName = dishToEdit!!.name,
-                    initialDescription = dishToEdit!!.description ?: "",
-                    initialInstructions = dishToEdit!!.instructions ?: "",
-                    initialCategories = categories,
-                    initialIngredients = ingredients.map {
-                        it.name to ((it.quantity ?: 0.0) to it.unit)
-                    },
-                    onDismiss = { dishToEdit = null },
+                    initialName = "",
+                    initialDescription = "",
+                    initialInstructions = "",
+                    initialCategories = emptyList(),
+                    initialIngredients = emptyList(),
+                    onDismiss = { showAddDishDialog = false },
                     onSave = { name, desc, instr, cats, ings ->
-                        dishViewModel.updateDish(
-                            dishToEdit!!.copy(
-                                name = name,
-                                description = desc,
-                                instructions = instr
-                            ),
-                            cats,
-                            ings
-                        )
-                        dishToEdit = null
+                        dishViewModel.addDish(name, desc, instr, cats, ings)
+                        showAddDishDialog = false
                     }
                 )
             }
+
 
 
         }}
