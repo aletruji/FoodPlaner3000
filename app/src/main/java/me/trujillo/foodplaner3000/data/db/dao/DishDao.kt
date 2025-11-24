@@ -19,4 +19,7 @@ interface DishDao{
 
     @Query("SELECT * FROM Dish")
     fun getAllDishes(): Flow<List<Dish>>
+
+
+
 }

@@ -92,6 +92,9 @@ data class IngredientWithAmount(
     val unit: Unit1
 )
 
+data class IngredientWithDishId(val dishId: Int, val name: String)
+data class CategoryWithDishId(val dishId: Int, val categoryName: String)
+
 
 
 

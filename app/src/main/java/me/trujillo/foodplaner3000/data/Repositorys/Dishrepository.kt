@@ -17,6 +17,11 @@ class DishRepository(
     suspend fun deleteDish(dish:Dish){
         dishDao.deleteDish(dish)
     }
+
+    fun getAllIngredientsForAllDishes() = relationsDao.getAllIngredientsForAllDishes()
+
+    fun getAllCategoriesForAllDishes() = relationsDao.getAllCategoriesForAllDishes()
+
     // --------------------------------------
     // LADE-KATEGORIEN
     // --------------------------------------

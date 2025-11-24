@@ -2,13 +2,16 @@ package me.trujillo.foodplaner3000.Viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import me.trujillo.foodplaner3000.data.Repositorys.DishRepository
 import me.trujillo.foodplaner3000.data.db.entities.Dish
 import me.trujillo.foodplaner3000.data.enums.Unit1
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 
@@ -16,13 +19,50 @@ class DishViewModel(
     private val repo: DishRepository
 ) : ViewModel() {
 
+    val query = MutableStateFlow("")
+    val filterType = MutableStateFlow("Dish")
 
-    val dishes: StateFlow<List<Dish>>
-        get() = repo.allDishes.stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(),
-            emptyList()
-        )
+    // Rohdaten aus DB
+    val dishes = repo.allDishes
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+
+    val ingredientsByDish = repo.getAllIngredientsForAllDishes()
+        .map { list -> list.groupBy { it.dishId } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
+
+    val categoriesByDish = repo.getAllCategoriesForAllDishes()
+        .map { list -> list.groupBy { it.dishId } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
+
+    // Fertig gefilterte Liste
+    val filteredDishes =
+        combine(
+            dishes,
+            ingredientsByDish,
+            categoriesByDish,
+            query,
+            filterType
+        ) { dishes, ingredients, categories, text, filter ->
+
+            when (filter) {
+                "Dish" -> dishes.filter {
+                    it.name.contains(text, ignoreCase = true)
+                }
+
+                "Ingredient" -> dishes.filter { dish ->
+                    ingredients[dish.id]
+                        ?.any { it.name.contains(text, ignoreCase = true) } == true
+                }
+
+                "Category" -> dishes.filter { dish ->
+                    categories[dish.id]
+                        ?.any { it.categoryName.contains(text, ignoreCase = true) } == true
+                }
+
+                else -> dishes
+            }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+
 
     // --------------------------------------
     // LOAD FUNCTIONS
@@ -90,3 +130,6 @@ class DishViewModel(
         }
     }
 }
+
+
+

@@ -5,9 +5,11 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
+import me.trujillo.foodplaner3000.data.db.entities.CategoryWithDishId
 import me.trujillo.foodplaner3000.data.db.entities.DishCategory
 import me.trujillo.foodplaner3000.data.db.entities.DishIngredient
 import me.trujillo.foodplaner3000.data.db.entities.IngredientWithAmount
+import me.trujillo.foodplaner3000.data.db.entities.IngredientWithDishId
 import me.trujillo.foodplaner3000.data.enums.Unit1
 
 @Dao
@@ -64,5 +66,18 @@ interface DishRelationsDao {
 
     @Delete
     suspend fun deleteDishIngredient(rel: DishIngredient)
+
+    @Query("SELECT dishId, name FROM Ingredient JOIN dishingredient ON ingredient.id = dishingredient.ingredientId")
+    fun getAllIngredientsForAllDishes(): Flow<List<IngredientWithDishId>>
+
+    @Query("""
+    SELECT 
+        dish_category.dishId AS dishId, 
+        Category.name AS categoryName
+    FROM Category
+    JOIN dish_category ON Category.id = dish_category.categoryId
+""")
+    fun getAllCategoriesForAllDishes(): Flow<List<CategoryWithDishId>>
+
 }
 

@@ -3,7 +3,10 @@ package me.trujillo.foodplaner3000.data.db.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 import me.trujillo.foodplaner3000.data.db.entities.Category
+import me.trujillo.foodplaner3000.data.db.entities.CategoryWithDishId
+import me.trujillo.foodplaner3000.data.db.entities.IngredientWithDishId
 
 @Dao
 interface CategoryDao{
@@ -16,6 +19,7 @@ interface CategoryDao{
 
     @Query("SELECT id FROM Category WHERE name = :name LIMIT 1")
     suspend fun getCategoryIdByName(name: String): Int?
+
 
 
 }

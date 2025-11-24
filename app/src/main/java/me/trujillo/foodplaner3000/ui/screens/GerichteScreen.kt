@@ -24,6 +24,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,7 +46,7 @@ import me.trujillo.foodplaner3000.Viewmodels.DishViewModelFactory
 import me.trujillo.foodplaner3000.data.Repositorys.DishRepository
 import me.trujillo.foodplaner3000.data.db.AppDatabase
 import me.trujillo.foodplaner3000.data.db.entities.Dish
-import me.trujillo.foodplaner3000.ui.AddDishDialog
+import me.trujillo.foodplaner3000.AddDishDialog
 import me.trujillo.foodplaner3000.ui.IconButtonAddDish
 import me.trujillo.foodplaner3000.ui.SimpleFilterDropdown
 
@@ -55,8 +56,7 @@ fun GerichteScreen(navController: NavHostController){
 
 
     var showAddPlateDialog by remember { mutableStateOf(false) }
-    var text by remember { mutableStateOf("")}
-    var filter by remember {mutableStateOf("Dish")}
+
     var showAddDishDialog by remember { mutableStateOf(false) }
     var dishToEdit by remember { mutableStateOf<Dish?>(null) }
 
@@ -82,7 +82,15 @@ fun GerichteScreen(navController: NavHostController){
     val dishViewModel: DishViewModel = viewModel(
         factory = DishViewModelFactory(dishRepo)
     )
-    val dishes by dishViewModel.dishes.collectAsState(initial = emptyList())
+    val text by dishViewModel.query.collectAsState()
+    val filter by dishViewModel.filterType.collectAsState()
+    val filteredDishes by dishViewModel.filteredDishes.collectAsState()
+
+    LaunchedEffect(Unit) {
+        dishViewModel.categoriesByDish.collect { map ->
+            println("CATEGORIES BY DISH = $map")
+        }
+    }
 
 
 
@@ -100,7 +108,7 @@ fun GerichteScreen(navController: NavHostController){
         ){
             OutlinedTextField(
                 value = text,
-                onValueChange = {text = it},
+                onValueChange = {dishViewModel.query.value = it},
                 label = { Text("Search", color = Color.Black) },
 
                 textStyle = TextStyle(color = Color.Black),
@@ -125,7 +133,7 @@ fun GerichteScreen(navController: NavHostController){
 
             SimpleFilterDropdown(
                 selected = filter,
-                onSelected = { filter = it },
+                onSelected = { dishViewModel.filterType.value = it },
 
                 )
 
@@ -148,9 +156,12 @@ fun GerichteScreen(navController: NavHostController){
             .background(Color(0xFF212121))){
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement =  Arrangement.Center,
+                verticalArrangement =  Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
-            ) { items(dishes){
+            ) { items(
+                items = filteredDishes,
+                key = {it.id}
+            ){
                 item-> Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -268,7 +279,7 @@ fun GerichteScreen(navController: NavHostController){
                             instr,
                             cats,
                             ings,
-                            imagePath                     // ← WICHTIG!
+                            imagePath
                         )
                         showAddDishDialog = false
                     }

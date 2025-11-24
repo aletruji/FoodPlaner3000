@@ -62,9 +62,9 @@ fun SimpleFilterDropdown(
                     }
                 )
                 DropdownMenuItem(
-                    text = { Text("Kategorie") },
+                    text = { Text("Category") },
                     onClick = {
-                        onSelected("Kategorie")
+                        onSelected("Category")
                         expanded = false
                     }
                 )
