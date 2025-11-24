@@ -17,6 +17,8 @@ class DishRepository(
     suspend fun deleteDish(dish:Dish){
         dishDao.deleteDish(dish)
     }
+    fun getDishById(id: Int) = dishDao.getDishById(id)
+
 
     fun getAllIngredientsForAllDishes() = relationsDao.getAllIngredientsForAllDishes()
 

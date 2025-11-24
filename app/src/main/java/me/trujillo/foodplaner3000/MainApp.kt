@@ -21,7 +21,16 @@ import me.trujillo.foodplaner3000.ui.BottomIconButtons
 import me.trujillo.foodplaner3000.ui.TopSection
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.navArgument
+import me.trujillo.foodplaner3000.Viewmodels.DishViewModel
+import me.trujillo.foodplaner3000.Viewmodels.DishViewModelFactory
+import me.trujillo.foodplaner3000.data.Repositorys.DishRepository
+import me.trujillo.foodplaner3000.data.db.AppDatabase
+import me.trujillo.foodplaner3000.ui.screens.DetailScreen
 import me.trujillo.foodplaner3000.ui.screens.GerichteScreen
 import me.trujillo.foodplaner3000.ui.screens.ListScreen
 
@@ -65,6 +74,17 @@ Column{
             composable("screen1") { ListScreen(navController) }
             composable("screen2") { GerichteScreen(navController) }
              composable("screen3") { RandomPlan(navController) }
+            composable(
+                route = "detail/{dishId}",
+                arguments = listOf(
+                    navArgument("dishId") { type = NavType.IntType }
+                )
+            ) { backStackEntry ->
+                val dishId = backStackEntry.arguments!!.getInt("dishId")
+                DetailScreen(navController = navController, dishId = dishId)
+            }
+
+
         }
     }
 }

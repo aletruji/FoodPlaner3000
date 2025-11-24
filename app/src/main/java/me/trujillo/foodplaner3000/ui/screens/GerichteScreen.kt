@@ -1,6 +1,7 @@
 package me.trujillo.foodplaner3000.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -167,6 +168,9 @@ fun GerichteScreen(navController: NavHostController){
                         .fillMaxWidth()
                         .height(56.dp)
                         .padding(horizontal = 12.dp, vertical = 6.dp)
+                        .clickable {
+                            navController.navigate("detail/${item.id}")
+                        }
 
                 ){
                 Row(

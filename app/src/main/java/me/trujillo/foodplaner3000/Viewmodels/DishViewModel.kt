@@ -129,6 +129,10 @@ class DishViewModel(
             repo.deleteDish(dish)
         }
     }
+
+    fun getDishById(id: Int) =
+        repo.getDishById(id)
+
 }
 
 
