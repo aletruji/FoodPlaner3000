@@ -89,14 +89,16 @@ class DishRepository(
         description: String?,
         instructions: String?,
         categories: List<String>,
-        ingredients: List<Pair<String, Pair<Double, Unit1>>>
+        ingredients: List<Pair<String, Pair<Double, Unit1>>>,
+        imagePath: String?
     ) {
         // 1) Dish speichern
         val dishId = dishDao.insertDish(
             Dish(
                 name = name,
                 description = description,
-                instructions = instructions
+                instructions = instructions,
+                imagePath = imagePath
             )
         ).toInt()
 

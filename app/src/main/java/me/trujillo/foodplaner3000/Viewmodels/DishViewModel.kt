@@ -63,7 +63,8 @@ class DishViewModel(
                 description = description,
                 instructions = instructions,
                 categories = categories,
-                ingredients = ingredients
+                ingredients = ingredients,
+                imagePath = imagePath
             )
 
 

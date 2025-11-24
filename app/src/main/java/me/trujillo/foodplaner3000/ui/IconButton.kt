@@ -1,6 +1,10 @@
 package me.trujillo.foodplaner3000.ui
 
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -36,11 +40,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import me.trujillo.foodplaner3000.DishImagePicker
+import androidx.core.content.FileProvider
 import me.trujillo.foodplaner3000.Viewmodels.ShoppingViewModel
 import me.trujillo.foodplaner3000.data.db.entities.ShoppingList
 import me.trujillo.foodplaner3000.data.enums.Unit1
+import java.io.File
+import coil.compose.rememberAsyncImagePainter
+
 
 
 @Composable
@@ -132,6 +141,10 @@ fun AddDishDialog(
 ) {
 
 
+// URI für Kamera-Foto
+    var tempCameraUri by remember { mutableStateOf<Uri?>(null) }
+
+    var cameraFile by remember { mutableStateOf<File?>(null) }
     var name by remember { mutableStateOf(initialName) }
     var description by remember { mutableStateOf(initialDescription) }
     var instructions by remember { mutableStateOf(initialInstructions) }
@@ -150,11 +163,26 @@ fun AddDishDialog(
     var newIngredientQuantity by remember { mutableStateOf("") }
     var newIngredientUnit by remember { mutableStateOf(Unit1.g) }
 
+    val context = LocalContext.current
 
-    DishImagePicker(
-        imagePath = imagePath,
-        onImageSelected = { imagePath = it }
-    )
+// --- Launcher für Galerie ---
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null) {
+            imagePath = uri.toString()
+        }
+    }
+
+// --- Launcher für Kamera ---
+    val cameraLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success && cameraFile != null) {
+            imagePath = cameraFile!!.absolutePath
+        }
+    }
+
 
 
 
@@ -166,6 +194,79 @@ fun AddDishDialog(
                 .fillMaxWidth()
                 .heightIn(max = 500.dp)         // maximale Dialoghöhe
                 .verticalScroll(rememberScrollState())) {
+
+
+                // =============================================
+//      BILD ABSCHNITT (Option B)
+// =============================================
+                Text("Foto:", fontWeight = FontWeight.Bold)
+
+                Spacer(Modifier.height(8.dp))
+
+// Bild-Vorschau (falls vorhanden)
+                if (imagePath != null) {
+                    Image(
+                        painter = rememberAsyncImagePainter(imagePath),
+                        contentDescription = "Dish image",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .background(Color.LightGray)
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .background(Color.DarkGray),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Kein Bild ausgewählt", color = Color.White)
+                    }
+                }
+
+                Spacer(Modifier.height(8.dp))
+
+// Button öffnet ein Menü (Kamera oder Galerie)
+                var showMenu by remember { mutableStateOf(false) }
+
+                Box {
+                    androidx.compose.material3.Button(onClick = { showMenu = true }) {
+                        Text("Foto hinzufügen")
+                    }
+
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Aus Galerie wählen") },
+                            onClick = {
+                                galleryLauncher.launch("image/*")
+                                showMenu = false
+                            }
+                        )
+
+                        DropdownMenuItem(
+                            text = { Text("Foto aufnehmen") },
+                            onClick = {
+                                cameraFile = File(context.filesDir, "dish_temp.jpg")
+
+                                val uri = FileProvider.getUriForFile(
+                                    context,
+                                    context.packageName + ".provider",
+                                    cameraFile!!
+                                )
+
+                                cameraLauncher.launch(uri)
+                                showMenu = false
+                            }
+                        )
+
+                    }
+                }
+
+                Spacer(Modifier.height(20.dp))
 
                 // -------------------------------
                 // NAME
