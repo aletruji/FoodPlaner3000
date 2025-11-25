@@ -173,7 +173,8 @@ fun AddDishDialog(
                         DropdownMenuItem(
                             text = { Text("Foto aufnehmen") },
                             onClick = {
-                                cameraFile = File(context.filesDir, "dish_temp.jpg")
+                                val fileName = "dish_${System.currentTimeMillis()}.jpg"
+                                cameraFile = File(context.filesDir, fileName)
 
                                 val uri = FileProvider.getUriForFile(
                                     context,
