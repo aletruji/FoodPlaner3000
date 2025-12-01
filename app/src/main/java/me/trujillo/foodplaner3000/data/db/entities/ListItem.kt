@@ -96,5 +96,19 @@ data class IngredientWithDishId(val dishId: Int, val name: String)
 data class CategoryWithDishId(val dishId: Int, val categoryName: String)
 
 
+data class ExportDish(
+    val name: String,
+    val description: String?,
+    val instructions: String?,
+    val categories: List<String>,
+    val ingredients: List<ExportIngredient>,
+    val imageBase64: String?
+)
+
+data class ExportIngredient(
+    val name: String,
+    val quantity: Double?,
+    val unit: Unit1
+)
 
 

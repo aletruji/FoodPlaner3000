@@ -245,7 +245,7 @@ fun GerichteScreen(navController: NavHostController){
                         initialIngredients = ingredients!!.map {
                             it.name to ((it.quantity ?: 0.0) to it.unit)
                         },
-                        initialImagePath = dishToEdit!!.imagePath,   // ← WICHTIG!
+                        initialImagePath = dishToEdit!!.imagePath,
                         onDismiss = { dishToEdit = null },
                         onSave = { name, desc, instr, cats, ings, imagePath ->
                             dishViewModel.updateDish(
@@ -253,7 +253,7 @@ fun GerichteScreen(navController: NavHostController){
                                     name = name,
                                     description = desc,
                                     instructions = instr,
-                                    imagePath = imagePath       // ← WICHTIG!
+                                    imagePath = imagePath
                                 ),
                                 cats,
                                 ings
@@ -274,7 +274,7 @@ fun GerichteScreen(navController: NavHostController){
                     initialInstructions = "",
                     initialCategories = emptyList(),
                     initialIngredients = emptyList(),
-                    initialImagePath = null,               // ← WICHTIG!
+                    initialImagePath = null,
                     onDismiss = { showAddDishDialog = false },
                     onSave = { name, desc, instr, cats, ings, imagePath ->
                         dishViewModel.addDish(

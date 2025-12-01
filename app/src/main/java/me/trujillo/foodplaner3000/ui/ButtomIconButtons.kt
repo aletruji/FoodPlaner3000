@@ -43,7 +43,7 @@ fun BottomIconButtons(navController: NavHostController) {
             Icon(Icons.Filled.Search, contentDescription = "Search", tint = Color.White)
         }
         // Vierter Button
-        IconButton(onClick = { /* Aktion für den vierten Button */ }) {
+        IconButton(onClick = { navController.navigate("screen4") }) {
             Icon(Icons.Filled.Settings, contentDescription = "Settings", tint = Color.White)
         }
     }

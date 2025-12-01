@@ -1,6 +1,8 @@
 package me.trujillo.foodplaner3000.data.Repositorys
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import me.trujillo.foodplaner3000.ExportFile
 import me.trujillo.foodplaner3000.data.db.dao.*
 import me.trujillo.foodplaner3000.data.db.entities.*
 import me.trujillo.foodplaner3000.data.enums.Unit1
@@ -139,4 +141,83 @@ class DishRepository(
             )
         }
     }
+
+    suspend fun dishExists(name: String): Boolean {
+        return dishDao.getDishIdByName(name) != null
+    }
+    suspend fun exportAllDishes(): ExportFile {
+        val all = dishDao.getAllDishes().first()
+
+        val list = all.map { dish ->
+            val categories = relationsDao.getCategoriesForDish(dish.id)
+            val ingredients = relationsDao.getIngredientsForDish(dish.id)
+
+            ExportDish(
+                name = dish.name,
+                description = dish.description,
+                instructions = dish.instructions,
+                imageBase64 = dish.imagePath,
+                categories = categories,
+                ingredients = ingredients.map {
+                    ExportIngredient(it.name, it.quantity, it.unit)
+                }
+            )
+        }
+
+        return ExportFile(list)
+    }
+    suspend fun importDishes(file: ExportFile) {
+        file.dishes.forEach { d ->
+
+            // 1) Check: Gericht existiert schon? (NACH NAME!)
+            val existingDishId = dishDao.getDishIdByName(d.name)
+            if (existingDishId != null) {
+                // Gericht überspringen, kein Duplikat erstellen
+                return@forEach
+            }
+
+            // 2) Gericht einfügen
+            val newDishId = dishDao.insertDish(
+                Dish(
+                    name = d.name,
+                    description = d.description,
+                    instructions = d.instructions,
+                    imagePath = d.imageBase64  // Base64 wurde schon in Pfad konvertiert
+                )
+            ).toInt()
+
+            // 3) Kategorien einfügen / oder vorhandene holen
+            d.categories.forEach { catName ->
+
+                val categoryId = categoryDao.getCategoryIdByName(catName)
+                    ?: categoryDao.insertCategory(Category(name = catName)).toInt()
+
+                relationsDao.insertDishCategory(
+                    DishCategory(
+                        dishId = newDishId,
+                        categoryId = categoryId
+                    )
+                )
+            }
+
+            // 4) Zutaten einfügen / oder vorhandene holen
+            d.ingredients.forEach { ing ->
+
+                val ingredientId = ingredientDao.getIngredientIdByName(ing.name)
+                    ?: ingredientDao.insertIngredient(Ingredient(name = ing.name)).toInt()
+
+                relationsDao.insertDishIngredient(
+                    DishIngredient(
+                        dishId = newDishId,
+                        ingredientId = ingredientId,
+                        quantity = ing.quantity,
+                        unit = ing.unit
+                    )
+                )
+            }
+        }
+    }
+
+
+
 }

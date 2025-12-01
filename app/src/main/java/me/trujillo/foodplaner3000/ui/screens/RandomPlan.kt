@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,7 +31,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import me.trujillo.foodplaner3000.Viewmodels.DishViewModel
 import me.trujillo.foodplaner3000.Viewmodels.DishViewModelFactory
+import me.trujillo.foodplaner3000.Viewmodels.ShoppingViewModel
+import me.trujillo.foodplaner3000.Viewmodels.ShoppingViewModelFactory
 import me.trujillo.foodplaner3000.data.Repositorys.DishRepository
+import me.trujillo.foodplaner3000.data.Repositorys.ShoppingListRepository
 import me.trujillo.foodplaner3000.data.db.AppDatabase
 import me.trujillo.foodplaner3000.data.db.entities.Dish
 
@@ -56,6 +60,13 @@ fun RandomPlan(
 
     var numberInput by remember { mutableStateOf("") }
     var randomDishes by remember { mutableStateOf<List<Dish>>(emptyList()) }
+
+
+    val shoppingRepo = ShoppingListRepository(db.shoppingListDao())
+    val shoppingViewModel: ShoppingViewModel = viewModel(
+        factory = ShoppingViewModelFactory(shoppingRepo)
+    )
+
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -84,6 +95,19 @@ fun RandomPlan(
                 ) {
                     Text("Randomize")
                 }
+
+                Button(
+                    onClick = {
+                        dishViewModel.addRandomDishesToShoppingList(
+                            shoppingViewModel,
+                            randomDishes
+                        )
+                    }
+                ) {
+                    Text("to list")
+                }
+
+
 
                 OutlinedTextField(
                     value = numberInput,

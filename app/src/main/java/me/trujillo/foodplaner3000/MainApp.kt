@@ -33,6 +33,7 @@ import me.trujillo.foodplaner3000.data.db.AppDatabase
 import me.trujillo.foodplaner3000.ui.screens.DetailScreen
 import me.trujillo.foodplaner3000.ui.screens.GerichteScreen
 import me.trujillo.foodplaner3000.ui.screens.ListScreen
+import me.trujillo.foodplaner3000.ui.screens.SettingScreen
 
 
 @Composable
@@ -74,6 +75,7 @@ Column{
             composable("screen1") { ListScreen(navController) }
             composable("screen2") { GerichteScreen(navController) }
              composable("screen3") { RandomPlan(navController) }
+            composable("screen4") { SettingScreen(navController) }
             composable(
                 route = "detail/{dishId}",
                 arguments = listOf(
