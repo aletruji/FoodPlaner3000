@@ -1,3 +1,6 @@
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.ScrollableState
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,8 +10,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -77,7 +85,7 @@ fun RandomPlan(
         Column(
             modifier = Modifier
                 .weight(1f)
-                .padding(16.dp)
+                //.padding(8.dp)
         ) {
 
             Row(
@@ -120,18 +128,31 @@ fun RandomPlan(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            Column(
+            LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {
-                randomDishes.forEach { dish ->
-                    Text(
+                items(randomDishes) { dish ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth()
+                    ){
+                        Card(colors = CardDefaults
+                        .cardColors(Color(0xFF565A47)),
+                        modifier = Modifier.fillMaxWidth()
+                            .height(57.dp)
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                            .clickable{
+                                // hier kommt add one single dish rein
+                            }
+
+                    ){Text(
                         text = dish.name,
                         color = Color.White,
                         fontSize = 20.sp,
-                        modifier = Modifier.padding(4.dp)
+                        modifier = Modifier.padding(8.dp)
+                            .align(Alignment.Start)
 
 
-                    )
+                    )}}
                 }
             }
         }

@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -36,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import coil.compose.rememberAsyncImagePainter
@@ -199,7 +201,8 @@ fun AddDishDialog(
                     value = name,
                     onValueChange = { name = it },
                     label = { Text("Name") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
                 )
 
                 Spacer(Modifier.height(12.dp))
@@ -256,7 +259,8 @@ fun AddDishDialog(
                         value = newCategory,
                         onValueChange = { newCategory = it },
                         label = { Text("Neue Kategorie") },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        singleLine = true
                     )
 
                     Spacer(Modifier.width(8.dp))
@@ -305,7 +309,8 @@ fun AddDishDialog(
                     value = newIngredientName,
                     onValueChange = { newIngredientName = it },
                     label = { Text("Zutat") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
                 )
 
                 Spacer(Modifier.height(8.dp))
@@ -315,7 +320,8 @@ fun AddDishDialog(
                         value = newIngredientQuantity,
                         onValueChange = { newIngredientQuantity = it },
                         label = { Text("Menge") },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                     )
 
                     Spacer(Modifier.width(8.dp))

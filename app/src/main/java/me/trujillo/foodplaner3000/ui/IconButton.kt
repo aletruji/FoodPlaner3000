@@ -45,9 +45,10 @@ fun IconButtonAdd(viewModel: ShoppingViewModel) {
             },
             modifier = Modifier
                 .align(Alignment.BottomEnd) // Rechts platzieren
-                .padding(25.dp)
-                .size(30.dp) // Kleinere Größe des Buttons
-                .background(Color(0xff8BC34A), shape = RoundedCornerShape(50)) // Runder Hintergrund
+                .padding(16.dp)
+                .size(60.dp) // Kleinere Größe des Buttons
+                .background(Color(0xff8BC34A),
+                    shape = RoundedCornerShape(50)) // Runder Hintergrund
         ) {
             Icon(
                 imageVector = Icons.Filled.Add, // Das "X"-Icon
@@ -75,21 +76,24 @@ fun IconButtonAdd(viewModel: ShoppingViewModel) {
         }
 
     }
-
 }
+
 
 @Composable
 fun IconButtonAddDish(onClick: () -> Unit) {
     Box(
         modifier = Modifier
-            .fillMaxWidth(),
-        contentAlignment = Alignment.BottomEnd
+            .fillMaxSize()
     ) {
         IconButton(
             onClick = onClick,
-            modifier = Modifier
+
+                    modifier = Modifier
                 .padding(16.dp)
-                .size(56.dp)
+                .size(60.dp)
+                        .align(Alignment.BottomEnd)
+                .background(Color(0xff8BC34A),
+                    shape = RoundedCornerShape(50))
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
